@@ -7,12 +7,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Scanner;
 
+/**
+ * @author anas
+ * @author emilio
+ */
 public class EscapeApp {
 
     public static final String SAVE_FILE_NAME = "save";
     private EscapeGame game;
     private boolean gameRunning = true;
 
+    /**
+     * Startet das Spiel und initialisiert die Spielumgebung.
+     */
     public static void main(String[] args) {
         System.out.println("Welcome to the HTW escape");
         System.out.println("========================================\n");
@@ -26,7 +33,9 @@ public class EscapeApp {
             System.out.println("====================");
         }
     }
-
+    /**
+     * Darstellung des Hauptmenues mit Auswahlmöglichkeiten.
+     */
     private void showMainMenu() {
         System.out.println("You're in the main menu");
         System.out.println("What do you want to do next?");
@@ -36,6 +45,9 @@ public class EscapeApp {
         System.out.println("Please choose a number between 1 and 6: ");
     }
 
+    /**
+     * Liest die Eingabe und gibt sie wieder aus.
+     */
     private String readUserInput() {
         Scanner scanner = new Scanner(System.in);
         String userInput = scanner.nextLine();
@@ -43,6 +55,9 @@ public class EscapeApp {
         return userInput;
     }
 
+    /** 
+     * Behandelt die Eingabe.
+    */
     private void handleUserInput(String input) {
         switch (input) {
             case "1":
@@ -59,22 +74,34 @@ public class EscapeApp {
         }
     }
 
+    /**
+     * Initialisiert die Spielumgebung.
+     */
     private void startGame() {
         this.game = new EscapeGame();
         resumeGame();
     }
 
+    /**
+     * Beendet die Pause und fuehrt das Spiel weiter.
+     */
     private void resumeGame() {
         this.game.setGameRunning(true);
         this.game.run();
     }
 
+    /**
+     * Loescht den Speicherstand.
+     */
     private void deleteGame() {
         if (new File(SAVE_FILE_NAME).delete()) {
             System.out.println("Game deleted!");
         }
     }
 
+    /**
+     * Speichert den aktuellen Stand des Spiels.
+     */
     private void saveGame() {
         try (FileOutputStream fos = new FileOutputStream(SAVE_FILE_NAME);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
@@ -87,6 +114,9 @@ public class EscapeApp {
         System.out.println("Game saved!");
     }
 
+    /**
+     * Laedt das Spiel mithilfe des Speicherstands.
+     */
     private void loadGame() {
         try (FileInputStream fis = new FileInputStream(SAVE_FILE_NAME);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
@@ -97,14 +127,23 @@ public class EscapeApp {
         }
     }
 
+    /**
+     * Ausgabe, ob das Spiel momentan laeuft.
+     */
     private boolean isGameRunning() {
         return game != null;
     }
 
+    /**
+     * Ausgabe, ob das Spiel beendet wurde.
+     */
     private boolean isGameFinished() {
         return game != null && game.isGameFinished();
     }
 
+    /**
+     * Ausgabe, ob ein Speicherstand vorhanden ist.
+     */
     private boolean hasSavedGame() {
         return new File(SAVE_FILE_NAME).exists();
     }
