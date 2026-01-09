@@ -43,8 +43,8 @@ public class EscapeApp {
         System.out.println("What do you want to do next?");
         System.out.println("(1) Start new game");
 
-        // Option 2: Nur anzeigen, wenn ein Spiel gestartet wurde
-        if (isGameRunning()) {
+        // Option 2: Nur anzeigen, wenn ein Spiel gestartet wurde UND nicht beendet ist
+        if (isGameRunning() && !isGameFinished()) {
             System.out.println("(2) Resume game");
         }
 
@@ -86,38 +86,30 @@ public class EscapeApp {
                 this.startGame();
                 break;
             case "2":
-                // Prüfen, ob ein Spiel aktuell läuft
-                if (isGameRunning()) {
+                if (isGameRunning() && !isGameFinished()) {
                     this.resumeGame();
                 } else {
-                    // Falls kein Spiel läuft: Fehlermeldung anzeigen
                     System.out.println("Invalid input. Please choose a correct number between 1 and 6");
                 }
                 break;
             case "3":
-                // Prüfen, ob ein gespeicherter Spielstand existiert
                 if (hasSavedGame()) {
                     this.loadGame();
                 } else {
-                    // Falls kein Spielstand vorhanden ist: Fehlermeldung anzeigen
                     System.out.println("Invalid input. Please choose a correct number between 1 and 6");
                 }
                 break;
             case "4":
-                // Prüfen, ob ein Spiel aktuell läuft
                 if (isGameRunning()) {
                     this.saveGame();
                 } else {
-                    // Falls kein Spiel läuft: Fehlermeldung anzeigen
                     System.out.println("Invalid input. Please choose a correct number between 1 and 6");
                 }
                 break;
             case "5":
-                // Prüfen, ob ein gespeicherter Spielstand existiert
                 if (hasSavedGame()) {
                     this.deleteGame();
                 } else {
-                    // Falls kein Spielstand vorhanden ist: Fehlermeldung anzeigen
                     System.out.println("Invalid input. Please choose a correct number between 1 and 6");
                 }
                 break;
@@ -126,7 +118,6 @@ public class EscapeApp {
                 System.exit(0);
                 break;
             default:
-                // Falls eine ungültige Eingabe getätigt wurde
                 System.out.println("Invalid input. Please choose a correct number between 1 and 6");
                 break;
         }
@@ -199,6 +190,13 @@ public class EscapeApp {
      */
     private boolean isGameRunning() {
         return game != null;
+    }
+
+    /**
+     * Ausgabe, ob das Spiel beendet wurde.
+     */
+    private boolean isGameFinished() {
+        return game != null && game.isGameFinished();
     }
 
     /**
