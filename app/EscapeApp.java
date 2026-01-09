@@ -33,13 +33,36 @@ public class EscapeApp {
             System.out.println("====================");
         }
     }
+
     /**
      * Darstellung des Hauptmenues mit Auswahlmöglichkeiten.
+     * Zeigt nur die verfügbaren Optionen basierend auf dem Spielzustand an.
      */
     private void showMainMenu() {
         System.out.println("You're in the main menu");
         System.out.println("What do you want to do next?");
         System.out.println("(1) Start new game");
+
+        // Option 2: Nur anzeigen, wenn ein Spiel gestartet wurde
+        if (isGameRunning()) {
+            System.out.println("(2) Resume game");
+        }
+
+        // Option 3: Nur anzeigen, wenn ein gespeichertes Spiel vorhanden ist
+        if (hasSavedGame()) {
+            System.out.println("(3) Load game");
+        }
+
+        // Option 4: Nur anzeigen, wenn ein Spiel gestartet wurde
+        if (isGameRunning()) {
+            System.out.println("(4) Save game");
+        }
+
+        // Option 5: Nur anzeigen, wenn ein gespeichertes Spiel vorhanden ist
+        if (hasSavedGame()) {
+            System.out.println("(5) Delete game");
+        }
+
         System.out.println("(6) Quit");
         System.out.println("");
         System.out.println("Please choose a number between 1 and 6: ");
@@ -51,24 +74,59 @@ public class EscapeApp {
     private String readUserInput() {
         Scanner scanner = new Scanner(System.in);
         String userInput = scanner.nextLine();
-        // TBD
         return userInput;
     }
 
-    /** 
+    /**
      * Behandelt die Eingabe.
-    */
+     */
     private void handleUserInput(String input) {
         switch (input) {
             case "1":
                 this.startGame();
                 break;
             case "2":
+                // Prüfen, ob ein Spiel aktuell läuft
+                if (isGameRunning()) {
+                    this.resumeGame();
+                } else {
+                    // Falls kein Spiel läuft: Fehlermeldung anzeigen
+                    System.out.println("Invalid input. Please choose a correct number between 1 and 6");
+                }
                 break;
-            // ...
+            case "3":
+                // Prüfen, ob ein gespeicherter Spielstand existiert
+                if (hasSavedGame()) {
+                    this.loadGame();
+                } else {
+                    // Falls kein Spielstand vorhanden ist: Fehlermeldung anzeigen
+                    System.out.println("Invalid input. Please choose a correct number between 1 and 6");
+                }
+                break;
+            case "4":
+                // Prüfen, ob ein Spiel aktuell läuft
+                if (isGameRunning()) {
+                    this.saveGame();
+                } else {
+                    // Falls kein Spiel läuft: Fehlermeldung anzeigen
+                    System.out.println("Invalid input. Please choose a correct number between 1 and 6");
+                }
+                break;
+            case "5":
+                // Prüfen, ob ein gespeicherter Spielstand existiert
+                if (hasSavedGame()) {
+                    this.deleteGame();
+                } else {
+                    // Falls kein Spielstand vorhanden ist: Fehlermeldung anzeigen
+                    System.out.println("Invalid input. Please choose a correct number between 1 and 6");
+                }
+                break;
             case "6":
+                System.out.println("Goodbye!");
+                System.exit(0);
                 break;
             default:
+                // Falls eine ungültige Eingabe getätigt wurde
                 System.out.println("Invalid input. Please choose a correct number between 1 and 6");
                 break;
         }
@@ -79,6 +137,7 @@ public class EscapeApp {
      */
     private void startGame() {
         this.game = new EscapeGame();
+        System.out.println("Game started!");
         resumeGame();
     }
 
@@ -86,8 +145,10 @@ public class EscapeApp {
      * Beendet die Pause und fuehrt das Spiel weiter.
      */
     private void resumeGame() {
-        this.game.setGameRunning(true);
-        this.game.run();
+        if (this.game != null) {
+            this.game.setGameRunning(true);
+            this.game.run();
+        }
     }
 
     /**
@@ -95,7 +156,9 @@ public class EscapeApp {
      */
     private void deleteGame() {
         if (new File(SAVE_FILE_NAME).delete()) {
-            System.out.println("Game deleted!");
+            System.out.println("Deleted save file");
+        } else {
+            System.out.println("No save file found to delete");
         }
     }
 
@@ -103,15 +166,19 @@ public class EscapeApp {
      * Speichert den aktuellen Stand des Spiels.
      */
     private void saveGame() {
+        if (this.game == null) {
+            System.out.println("No game to save!");
+            return;
+        }
+
         try (FileOutputStream fos = new FileOutputStream(SAVE_FILE_NAME);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(game);
             oos.flush();
+            System.out.println("Save game file");
         } catch (Exception ex) {
             System.err.println("Something went wrong while saving the game: " + ex.getMessage());
-            return;
         }
-        System.out.println("Game saved!");
     }
 
     /**
@@ -121,7 +188,7 @@ public class EscapeApp {
         try (FileInputStream fis = new FileInputStream(SAVE_FILE_NAME);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             this.game = (EscapeGame) ois.readObject();
-            System.out.println("Game loaded!");
+            System.out.println("Load save file");
         } catch (Exception ex) {
             System.err.println("Something went wrong while loading the game: " + ex.getMessage());
         }
@@ -132,13 +199,6 @@ public class EscapeApp {
      */
     private boolean isGameRunning() {
         return game != null;
-    }
-
-    /**
-     * Ausgabe, ob das Spiel beendet wurde.
-     */
-    private boolean isGameFinished() {
-        return game != null && game.isGameFinished();
     }
 
     /**
