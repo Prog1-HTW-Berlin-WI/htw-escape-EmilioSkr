@@ -209,6 +209,16 @@ public class EscapeApp {
     }
 
     /**
+     * Ausgabe, ob das Spiel beendet wurde.
+     * 
+     * @return wahr, wenn Spielinstanz existiert und Spiel beendet wurde
+     */
+    private boolean isGameFinished() {
+        return game != null && game.isGameFinished();
+    }
+
+
+    /**
      * Prueft, ob ein Speicherstand vorhanden ist.
      * 
      * @return wahr, wenn ein Speicherstand vorhanden ist, sonst falsch
