@@ -196,7 +196,9 @@ public class EscapeApp {
             System.out.println("Load save file");
         } catch (Exception ex) {
             System.err.println("Something went wrong while loading the game: " + ex.getMessage());
+            return;
         }
+        System.out.println("Game saved!");
     }
 
     /**
