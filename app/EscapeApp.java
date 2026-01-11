@@ -52,27 +52,27 @@ public class EscapeApp {
         System.out.println("You're in the main menu");
         System.out.println("What do you want to do next?");
         System.out.println("(1) Start new game");
-        
-        // Option 2: Nur anzeigen, wenn ein Spiel gestartet wurde
-        if (isGameRunning()) {
+
+        // Option 2: Nur anzeigen, wenn ein Spiel gestartet wurde UND nicht beendet ist
+        if (isGameRunning() && !isGameFinished()) {
             System.out.println("(2) Resume game");
         }
-        
+
         // Option 3: Nur anzeigen, wenn ein gespeichertes Spiel vorhanden ist
         if (hasSavedGame()) {
             System.out.println("(3) Load game");
         }
-        
+
         // Option 4: Nur anzeigen, wenn ein Spiel gestartet wurde
         if (isGameRunning()) {
             System.out.println("(4) Save game");
         }
-        
+
         // Option 5: Nur anzeigen, wenn ein gespeichertes Spiel vorhanden ist
         if (hasSavedGame()) {
             System.out.println("(5) Delete game");
         }
-        
+
         System.out.println("(6) Quit");
         System.out.println("");
         System.out.println("Please choose a number between 1 and 6: ");
@@ -89,7 +89,7 @@ public class EscapeApp {
         return userInput;
     }
 
-    /** 
+    /**
      * Behandelt die Eingabe.
      * 
      * @param input Eingabe, das der Nutzer in die Konsole eingetippt hat
@@ -100,7 +100,7 @@ public class EscapeApp {
                 this.startGame();
                 break;
             case "2":
-                if (isGameRunning()) {
+                if (isGameRunning() && !isGameFinished()) {
                     this.resumeGame();
                 } else {
                     System.out.println("Invalid input. Please choose a correct number between 1 and 6");
@@ -175,7 +175,7 @@ public class EscapeApp {
             System.out.println("No game to save!");
             return;
         }
-        
+
         try (FileOutputStream fos = new FileOutputStream(SAVE_FILE_NAME);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(game);

@@ -76,7 +76,9 @@ public class EscapeGame {
      * Start der Hauptlogik des Spiels.
      */
     public void run() {
-        System.out.println("The game has started. Or not?");
+        // System.out.println("The game has started. Or not?");
+        System.out.println("Choose a name for your hero:");
+        
     }
 
     /**
