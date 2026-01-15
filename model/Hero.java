@@ -173,4 +173,31 @@ public class Hero implements Serializable {
     public boolean isOperational() {
         return healthPoints > 0;
     }
+
+    /**
+     * Liefert den Namen des Helden.
+     *
+     * @return Name des Helden
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Liefert die aktuellen Lebenspunkte des Helden.
+     *
+     * @return Lebenspunkte
+     */
+    public int getHealthPoints() {
+        return healthPoints;
+    }
+
+    /**
+     * Gibt eine Kopie der unterschriebenen Übungsgruppenleiter*innen zurueck.
+     *
+     * @return Array-Kopie der unterschreibenden Leiter
+     */
+    public Lecturer[] getSignedExerciseLecturers() {
+        return signedExerciseLecturers.clone();
+    }
 }

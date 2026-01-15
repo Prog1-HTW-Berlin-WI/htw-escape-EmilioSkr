@@ -2,6 +2,9 @@ package app;
 
 import model.Hero;
 import model.HTWRoom;
+import model.Lecturer;
+
+import java.util.Scanner;
 
 /**
  * Die Klasse EscapeGame stellt die Spiellogik des Spiels dar.
@@ -14,7 +17,7 @@ public class EscapeGame {
     /**
      * Stellt den Spielcharakter des Spielers dar.
      */
-    private final Hero hero;
+    private Hero hero;
     /**
      * Die Raeume des Spiels. Es gibt im Spiel genau drei Raeume.
      */
@@ -29,11 +32,16 @@ public class EscapeGame {
     private boolean gameFinished = false;
 
     /**
+     * Scanner fuer Nutzereingaben.
+     */
+    private final Scanner scanner = new Scanner(System.in);
+
+    /**
      * Konstruktor der Spielumgebung.
      * Initialisiert das Spiel und erstellt einen neuen Spielcharakter.
      */
     public EscapeGame() {
-        this.hero = new Hero("Player1");
+        this.hero = null;
     }
 
     /**
@@ -76,9 +84,22 @@ public class EscapeGame {
      * Start der Hauptlogik des Spiels.
      */
     public void run() {
-        // System.out.println("The game has started. Or not?");
-        System.out.println("Choose a name for your hero:");
-        
+        if (hero == null) {
+            System.out.println("Choose a name for your hero:");
+            String name = readUserInput();
+            if (name == null || name.trim().isEmpty()) {
+                name = "Hero";
+            }
+            this.hero = new Hero(name.trim());
+            System.out.println("Hero " + hero.getName() + " created.\n");
+        }
+
+        while (gameRunning && !gameFinished) {
+            printMenu();
+            String choice = readUserInput();
+            handleMenuChoice(choice);
+            System.out.println();
+        }
     }
 
     /**
@@ -88,5 +109,115 @@ public class EscapeGame {
      */
     public Hero getHero() {
         return hero;
+    }
+
+    /**
+     * Liest eine Nutzereingabe ein.
+     *
+     * @return Eingabezeile
+     */
+    private String readUserInput() {
+        return scanner.nextLine();
+    }
+
+    /**
+     * Zeigt das Spielmenue an.
+     */
+    private void printMenu() {
+        System.out.println("What do you want to do?");
+        System.out.println("(1) Explore the university");
+        System.out.println("(2) Show hero status");
+        System.out.println("(3) Show signed slip");
+        System.out.println("(4) Take a rest");
+        System.out.println("(5) Exit game");
+    }
+
+    /**
+     * Reagiert auf die Nutzerauswahl aus dem Menue.
+     *
+     * @param choice Auswahlstring
+     */
+    private void handleMenuChoice(String choice) {
+        switch (choice) {
+            case "1":
+                exploreCampus();
+                break;
+            case "2":
+                showHeroStatus();
+                break;
+            case "3":
+                showSignedSlip();
+                break;
+            case "4":
+                takeRest();
+                break;
+            case "5":
+                System.out.println("Exiting game.");
+                gameFinished = true;
+                gameRunning = false;
+                break;
+            default:
+                System.out.println("Invalid input. Please choose between 1 and 5.");
+                break;
+        }
+    }
+
+    /**
+     * Platzhalter fuer Erkundung.
+     */
+    private void exploreCampus() {
+        System.out.println("You explore the university. (Content to be implemented.)");
+    }
+
+    /**
+     * Gibt Statuswerte des Helden aus.
+     */
+    private void showHeroStatus() {
+        if (hero == null) {
+            System.out.println("No hero available.");
+            return;
+        }
+        System.out.println("Hero: " + hero.getName());
+        System.out.println("Health: " + hero.getHealthPoints());
+        System.out.println("Experience: " + hero.getExperiencePoints());
+    }
+
+    /**
+     * Zeigt den Laufzettel mit unterschriebenen Leitungen.
+     */
+    private void showSignedSlip() {
+        if (hero == null) {
+            System.out.println("No hero available.");
+            return;
+        }
+        Lecturer[] lecturers = hero.getSignedExerciseLecturers();
+        boolean hasEntries = false;
+        for (Lecturer lecturer : lecturers) {
+            if (lecturer != null) {
+                hasEntries = true;
+                System.out.println("- " + lecturer.getName());
+            }
+        }
+        if (!hasEntries) {
+            System.out.println("No signatures yet.");
+        }
+    }
+
+    /**
+     * Fuehrt eine Verschnaufpause durch.
+     */
+    private void takeRest() {
+        if (hero == null) {
+            System.out.println("No hero available.");
+            return;
+        }
+        int before = hero.getHealthPoints();
+        hero.regenerate(false);
+        int after = hero.getHealthPoints();
+        if (after == before) {
+            System.out.println("No small rest available anymore.");
+        } else {
+            System.out.println("You take a rest. Health is now: " + after);
+        }
     }
 }
