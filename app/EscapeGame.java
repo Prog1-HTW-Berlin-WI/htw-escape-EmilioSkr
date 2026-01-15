@@ -33,7 +33,7 @@ public class EscapeGame {
      * Initialisiert das Spiel und erstellt einen neuen Spielcharakter.
      */
     public EscapeGame() {
-        this.hero = new Hero();
+        this.hero = new Hero("Player1");
     }
 
     /**
