@@ -191,15 +191,28 @@ public class EscapeGame {
             return;
         }
         Lecturer[] lecturers = hero.getSignedExerciseLecturers();
-        boolean hasEntries = false;
-        for (Lecturer lecturer : lecturers) {
-            if (lecturer != null) {
-                hasEntries = true;
-                System.out.println("- " + lecturer.getName());
+        
+        String[] names = new String[5];
+
+        names[0] = "Prof1";
+        names[1] = "Prof2";
+        names[2] = "Prof3";
+        names[3] = "Prof4";
+        names[4] = "Prof5";
+
+
+        for (int i = 0; i < lecturers.length; i++) {
+
+            Lecturer lecturer = lecturers[i];
+            boolean signed = lecturer != null;
+            String checkbox = signed ? "[x]" : "[ ]";
+            String label = names[i] ;
+
+            if (signed) {
+                System.out.println(checkbox + " " + label + " - " + lecturer.getName());
+            } else {
+                System.out.println(checkbox + " " + label);
             }
-        }
-        if (!hasEntries) {
-            System.out.println("No signatures yet.");
         }
     }
 
