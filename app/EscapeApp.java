@@ -7,8 +7,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Scanner;
 
+import model.Hero;
+
 /**
- * Die Klasse EscapeApp dient zur Anzeige der Spiellogik und regelt die Interaktion zwischen Konsole und Spieler.
+ * Die Klasse EscapeApp dient zur Anzeige der Spiellogik und regelt die
+ * Interaktion zwischen Konsole und Spieler.
  * 
  * @author anas
  * @author emilio
@@ -41,6 +44,7 @@ public class EscapeApp {
             String choice = app.readUserInput();
             app.handleUserInput(choice);
             System.out.println("====================");
+
         }
     }
 
@@ -177,7 +181,7 @@ public class EscapeApp {
         }
 
         try (FileOutputStream fos = new FileOutputStream(SAVE_FILE_NAME);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+                ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(game);
             oos.flush();
             System.out.println("Save game file");
@@ -191,7 +195,7 @@ public class EscapeApp {
      */
     private void loadGame() {
         try (FileInputStream fis = new FileInputStream(SAVE_FILE_NAME);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
+                ObjectInputStream ois = new ObjectInputStream(fis)) {
             this.game = (EscapeGame) ois.readObject();
             System.out.println("Load save file");
         } catch (Exception ex) {
@@ -219,7 +223,6 @@ public class EscapeApp {
         return game != null && game.isGameFinished();
     }
 
-
     /**
      * Prueft, ob ein Speicherstand vorhanden ist.
      * 
@@ -227,6 +230,71 @@ public class EscapeApp {
      */
     private boolean hasSavedGame() {
         return new File(SAVE_FILE_NAME).exists();
+    }
+
+    /**
+     * Zeigt das Spielmenue an.
+     */
+    private void printMenu() {
+        System.out.println("What do you want to do?");
+        System.out.println("(1) Explore the university");
+        System.out.println("(2) Show hero status");
+        System.out.println("(3) Show signed slip");
+        System.out.println("(4) Take a rest");
+        System.out.println("(5) Exit game");
+    }
+
+    /**
+     * Reagiert auf die Nutzerauswahl aus dem Menue.
+     *
+     * @param choice Auswahlstring
+     */
+    private void handleMenuChoice(String choice) {
+        switch (choice) {
+            case "1":
+                game.exploreCampus();
+                break;
+            case "2":
+                game.showHeroStatus();
+                break;
+            case "3":
+                game.showSignedSlip();
+                break;
+            case "4":
+                game.takeRest();
+                break;
+            case "5":
+                System.out.println("Exiting game.");
+                game.setGameFinished(true);
+                game.setGameRunning(false);
+                break;
+            default:
+                System.out.println("Invalid input. Please choose between 1 and 5.");
+                break;
+        }
+    }
+
+    /**
+     * Start der Hauptlogik des Spiels.
+     */
+    public void run() {
+        if (game.getHero() == null) {
+            System.out.println("Choose a name for your hero:");
+            String name = readUserInput();
+            if (name == null || name.trim().isEmpty()) {
+                name = "Hero";
+            }
+
+            game.createHero(name.trim());
+            System.out.println("Hero " + game.getHero().getName() + " created.\n");
+        }
+
+        while (gameRunning && !game.isGameFinished()) {
+            printMenu();
+            String choice = readUserInput();
+            handleMenuChoice(choice);
+            System.out.println();
+        }
     }
 
 }

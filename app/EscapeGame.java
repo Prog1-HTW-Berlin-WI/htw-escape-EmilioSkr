@@ -80,27 +80,7 @@ public class EscapeGame {
         this.gameFinished = gameFinished;
     }
 
-    /**
-     * Start der Hauptlogik des Spiels.
-     */
-    public void run() {
-        if (hero == null) {
-            System.out.println("Choose a name for your hero:");
-            String name = readUserInput();
-            if (name == null || name.trim().isEmpty()) {
-                name = "Hero";
-            }
-            this.hero = new Hero(name.trim());
-            System.out.println("Hero " + hero.getName() + " created.\n");
-        }
-
-        while (gameRunning && !gameFinished) {
-            printMenu();
-            String choice = readUserInput();
-            handleMenuChoice(choice);
-            System.out.println();
-        }
-    }
+    
 
     /**
      * Gibt den aktuellen Spielcharakter zurueck.
@@ -111,68 +91,19 @@ public class EscapeGame {
         return hero;
     }
 
-    /**
-     * Liest eine Nutzereingabe ein.
-     *
-     * @return Eingabezeile
-     */
-    private String readUserInput() {
-        return scanner.nextLine();
-    }
-
-    /**
-     * Zeigt das Spielmenue an.
-     */
-    private void printMenu() {
-        System.out.println("What do you want to do?");
-        System.out.println("(1) Explore the university");
-        System.out.println("(2) Show hero status");
-        System.out.println("(3) Show signed slip");
-        System.out.println("(4) Take a rest");
-        System.out.println("(5) Exit game");
-    }
-
-    /**
-     * Reagiert auf die Nutzerauswahl aus dem Menue.
-     *
-     * @param choice Auswahlstring
-     */
-    private void handleMenuChoice(String choice) {
-        switch (choice) {
-            case "1":
-                exploreCampus();
-                break;
-            case "2":
-                showHeroStatus();
-                break;
-            case "3":
-                showSignedSlip();
-                break;
-            case "4":
-                takeRest();
-                break;
-            case "5":
-                System.out.println("Exiting game.");
-                gameFinished = true;
-                gameRunning = false;
-                break;
-            default:
-                System.out.println("Invalid input. Please choose between 1 and 5.");
-                break;
-        }
-    }
+ 
 
     /**
      * Platzhalter fuer Erkundung.
      */
-    private void exploreCampus() {
+    public void exploreCampus() {
         System.out.println("You explore the university. (Content to be implemented.)");
     }
 
     /**
      * Gibt Statuswerte des Helden aus.
      */
-    private void showHeroStatus() {
+    public void showHeroStatus() {
         if (hero == null) {
             System.out.println("No hero available.");
             return;
@@ -185,7 +116,7 @@ public class EscapeGame {
     /**
      * Zeigt den Laufzettel mit unterschriebenen Leitungen.
      */
-    private void showSignedSlip() {
+    public void showSignedSlip() {
         if (hero == null) {
             System.out.println("No hero available.");
             return;
@@ -219,7 +150,7 @@ public class EscapeGame {
     /**
      * Fuehrt eine Verschnaufpause durch.
      */
-    private void takeRest() {
+    public void takeRest() {
         if (hero == null) {
             System.out.println("No hero available.");
             return;
@@ -232,5 +163,14 @@ public class EscapeGame {
         } else {
             System.out.println("You take a rest. Health is now: " + after);
         }
+    }
+
+
+    public void run(){
+        assert true;
+    }
+
+    public void createHero(String name){
+        this.hero = new Hero(name);
     }
 }
