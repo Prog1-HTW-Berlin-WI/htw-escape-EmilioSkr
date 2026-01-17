@@ -54,7 +54,7 @@ public class EscapeApp {
         System.out.println("(1) Start new game");
 
         // Option 2: Nur anzeigen, wenn ein Spiel gestartet wurde UND nicht beendet ist
-        if (isGameRunning() && !isGameFinished()) {
+        if (isGameRunning() && hasSavedGame()) {
             System.out.println("(2) Resume game");
         }
 
@@ -100,7 +100,7 @@ public class EscapeApp {
                 this.startGame();
                 break;
             case "2":
-                if (isGameRunning() && !isGameFinished()) {
+                if (isGameRunning() && hasSavedGame()) {
                     this.resumeGame();
                 } else {
                     System.out.println("Invalid input. Please choose a correct number between 1 and 6");
