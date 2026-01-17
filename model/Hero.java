@@ -12,7 +12,7 @@ public class Hero implements Serializable {
     /**
      * maximale Anzahl an Lebenspunkte
      */
-    private static final int maxHealth = 50;
+    private static final int MAXHEALTH = 50;
     /**
      * Name des Spielcharakters
      */
@@ -44,7 +44,7 @@ public class Hero implements Serializable {
      */
     public Hero(String name) {
         this.name = name;
-        this.healthPoints = maxHealth;
+        this.healthPoints = MAXHEALTH;
         this.experiencePoints = 0;
         this.signedExerciseLecturers = new Lecturer[5];
     }
@@ -81,8 +81,8 @@ public class Hero implements Serializable {
             smallRestUsed = true;
         }
 
-        if (healthPoints > maxHealth) {
-            healthPoints = maxHealth;
+        if (healthPoints > MAXHEALTH) {
+            healthPoints = MAXHEALTH;
         }
     }
 

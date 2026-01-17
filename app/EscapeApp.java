@@ -7,8 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Scanner;
 
-import model.Hero;
-
+import model.Lecturer;
 /**
  * Die Klasse EscapeApp dient zur Anzeige der Spiellogik und regelt die
  * Interaktion zwischen Konsole und Spieler.
@@ -29,7 +28,6 @@ public class EscapeApp {
      * Gibt an, ob das Spiel momentan läuft.
      */
     private boolean gameRunning = true;
-
     /**
      * Startet das Spiel und initialisiert die Spielumgebung.
      */
@@ -44,7 +42,11 @@ public class EscapeApp {
             String choice = app.readUserInput();
             app.handleUserInput(choice);
             System.out.println("====================");
-
+            if (app.game != null && app.game.getHero() == null) {
+                app.askHero();
+            }
+            System.out.println("held");
+            app.gameLoop();
         }
     }
 
@@ -58,7 +60,8 @@ public class EscapeApp {
         System.out.println("(1) Start new game");
 
         // Option 2: Nur anzeigen, wenn ein Spiel gestartet wurde UND nicht beendet ist
-        if (isGameRunning() && !isGameFinished()) {
+        System.out.println(hasSavedGame());
+        if (isGameRunning() && isGameFinished() && hasSavedGame()) {
             System.out.println("(2) Resume game");
         }
 
@@ -104,7 +107,8 @@ public class EscapeApp {
                 this.startGame();
                 break;
             case "2":
-                if (isGameRunning() && !isGameFinished()) {
+                System.out.println(hasSavedGame());
+                if (isGameRunning() && isGameFinished() && hasSavedGame()) {
                     this.resumeGame();
                 } else {
                     System.out.println("Invalid input. Please choose a correct number between 1 and 6");
@@ -157,6 +161,7 @@ public class EscapeApp {
         if (this.game != null) {
             this.game.setGameRunning(true);
             this.game.run();
+            this.gameLoop();
         }
     }
 
@@ -181,13 +186,15 @@ public class EscapeApp {
         }
 
         try (FileOutputStream fos = new FileOutputStream(SAVE_FILE_NAME);
-                ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(game);
             oos.flush();
             System.out.println("Save game file");
         } catch (Exception ex) {
             System.err.println("Something went wrong while saving the game: " + ex.getMessage());
+            return;
         }
+        System.out.println("Game saved!");
     }
 
     /**
@@ -195,14 +202,13 @@ public class EscapeApp {
      */
     private void loadGame() {
         try (FileInputStream fis = new FileInputStream(SAVE_FILE_NAME);
-                ObjectInputStream ois = new ObjectInputStream(fis)) {
+            ObjectInputStream ois = new ObjectInputStream(fis)) {
             this.game = (EscapeGame) ois.readObject();
-            System.out.println("Load save file");
+            System.out.println("Game loaded!");
         } catch (Exception ex) {
             System.err.println("Something went wrong while loading the game: " + ex.getMessage());
             return;
         }
-        System.out.println("Game saved!");
     }
 
     /**
@@ -252,21 +258,21 @@ public class EscapeApp {
     private void handleMenuChoice(String choice) {
         switch (choice) {
             case "1":
-                game.exploreCampus();
+                this.game.exploreCampus();
                 break;
             case "2":
-                game.showHeroStatus();
+                this.showHeroStatus();
                 break;
             case "3":
-                game.showSignedSlip();
+                this.showSignedSlip();
                 break;
             case "4":
-                game.takeRest();
+                this.game.takeRest();
                 break;
             case "5":
                 System.out.println("Exiting game.");
-                game.setGameFinished(true);
-                game.setGameRunning(false);
+                this.game.setGameFinished(true);
+                this.game.setGameRunning(false);
                 break;
             default:
                 System.out.println("Invalid input. Please choose between 1 and 5.");
@@ -275,26 +281,72 @@ public class EscapeApp {
     }
 
     /**
-     * Start der Hauptlogik des Spiels.
+     * Fragt nach den Namen des Spielcharakters.
      */
-    public void run() {
-        if (game.getHero() == null) {
+    public void askHero() {
+        if (this.game.getHero() == null) {
             System.out.println("Choose a name for your hero:");
             String name = readUserInput();
             if (name == null || name.trim().isEmpty()) {
                 name = "Hero";
             }
 
-            game.createHero(name.trim());
-            System.out.println("Hero " + game.getHero().getName() + " created.\n");
-        }
-
-        while (gameRunning && !game.isGameFinished()) {
-            printMenu();
-            String choice = readUserInput();
-            handleMenuChoice(choice);
-            System.out.println();
+            this.game.createHero(name.trim());
+            System.out.println("Hero " + this.game.getHero().getName() + " created.\n");
         }
     }
+    /**
+     * Gibt Statuswerte des Helden aus.
+     */
+    public void showHeroStatus() {
+        if (this.game.getHero() == null) {
+            System.out.println("No hero available.");
+            return;
+        }
+        System.out.println("Hero: " + this.game.getHero().getName());
+        System.out.println("Health: " + this.game.getHero().getHealthPoints());
+        System.out.println("Experience: " + this.game.getHero().getExperiencePoints());
+    }
 
+    /**
+     * Zeigt den Laufzettel mit unterschriebenen Leitungen.
+     */
+    public void showSignedSlip() {
+        if (this.game.getHero() == null) {
+            System.out.println("No hero available.");
+            return;
+        }
+        Lecturer[] lecturers = this.game.getHero().getSignedExerciseLecturers();
+        
+        String[] names = new String[5];
+
+        names[0] = "Prof1";
+        names[1] = "Prof2";
+        names[2] = "Prof3";
+        names[3] = "Prof4";
+        names[4] = "Prof5";
+
+
+        for (int i = 0; i < lecturers.length; i++) {
+
+            Lecturer lecturer = lecturers[i];
+            boolean signed = lecturer != null;
+            String checkbox = signed ? "[x]" : "[ ]";
+            String label = names[i];
+
+            if (signed) {
+                System.out.println(checkbox + " " + label + " - " + lecturer.getName());
+            } else {
+                System.out.println(checkbox + " " + label);
+            }
+        }
+    }
+    private void gameLoop() {
+        while (this.game != null && this.gameRunning) {
+                this.printMenu();
+                String choiceHero = this.readUserInput();
+                this.handleMenuChoice(choiceHero);
+                System.out.println();
+            }
+    }
 }

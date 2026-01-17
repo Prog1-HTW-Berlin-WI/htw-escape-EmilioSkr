@@ -4,8 +4,6 @@ import model.Hero;
 import model.HTWRoom;
 import model.Lecturer;
 
-import java.util.Scanner;
-
 /**
  * Die Klasse EscapeGame stellt die Spiellogik des Spiels dar.
  * 
@@ -30,11 +28,14 @@ public class EscapeGame {
      * Gibt an, ob das Spiel beendet wurde.
      */
     private boolean gameFinished = false;
-
     /**
-     * Scanner fuer Nutzereingaben.
+     * Gibt die Anzahl an Übungsleiter*innen an.
      */
-    private final Scanner scanner = new Scanner(System.in);
+    private static final int MAXLECTURER = 5;
+    /**
+     * Gibt die aktuelle Runde im Spielgeschehen an.
+     */
+    private int currentRound = 1;
 
     /**
      * Konstruktor der Spielumgebung.
@@ -101,53 +102,6 @@ public class EscapeGame {
     }
 
     /**
-     * Gibt Statuswerte des Helden aus.
-     */
-    public void showHeroStatus() {
-        if (hero == null) {
-            System.out.println("No hero available.");
-            return;
-        }
-        System.out.println("Hero: " + hero.getName());
-        System.out.println("Health: " + hero.getHealthPoints());
-        System.out.println("Experience: " + hero.getExperiencePoints());
-    }
-
-    /**
-     * Zeigt den Laufzettel mit unterschriebenen Leitungen.
-     */
-    public void showSignedSlip() {
-        if (hero == null) {
-            System.out.println("No hero available.");
-            return;
-        }
-        Lecturer[] lecturers = hero.getSignedExerciseLecturers();
-        
-        String[] names = new String[5];
-
-        names[0] = "Prof1";
-        names[1] = "Prof2";
-        names[2] = "Prof3";
-        names[3] = "Prof4";
-        names[4] = "Prof5";
-
-
-        for (int i = 0; i < lecturers.length; i++) {
-
-            Lecturer lecturer = lecturers[i];
-            boolean signed = lecturer != null;
-            String checkbox = signed ? "[x]" : "[ ]";
-            String label = names[i] ;
-
-            if (signed) {
-                System.out.println(checkbox + " " + label + " - " + lecturer.getName());
-            } else {
-                System.out.println(checkbox + " " + label);
-            }
-        }
-    }
-
-    /**
      * Fuehrt eine Verschnaufpause durch.
      */
     public void takeRest() {
@@ -165,12 +119,11 @@ public class EscapeGame {
         }
     }
 
-
     public void run(){
         assert true;
     }
 
     public void createHero(String name){
-        this.hero = new Hero(name);
+        hero = new Hero(name);
     }
 }

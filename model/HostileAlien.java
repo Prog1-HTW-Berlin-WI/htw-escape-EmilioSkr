@@ -4,7 +4,6 @@ package model;
  * Feindliches Alien mit hoeheren Lebenspunkten.
  */
 public class HostileAlien extends Alien {
-
     /**
      * Erstellt ein feindliches Alien mit Standardwerten.
      */
