@@ -46,6 +46,10 @@ public class EscapeGame {
      * Index des aktuellen Raums (0..rooms.length-1).
      */
     private int currentRoomIndex = -1;
+    /**
+     * alle Übungsleiterinstanzen
+     */
+    private Lecturer[] allLecturers;
 
     /**
      * Scanner fuer Nutzereingaben.
@@ -109,7 +113,7 @@ public class EscapeGame {
             this.hero = new Hero(name.trim());
             System.out.println("Hero " + hero.getName() + " created.\n");
         }
-
+        initializeRooms();
         while (gameRunning) {
             printMenu();
             String choice = readUserInput();
@@ -200,22 +204,14 @@ public class EscapeGame {
             return;
         }
         Lecturer[] lecturers = hero.getSignedExerciseLecturers();
-        
-        String[] names = new String[5];
-
-        names[0] = "Prof1";
-        names[1] = "Prof2";
-        names[2] = "Prof3";
-        names[3] = "Prof4";
-        names[4] = "Prof5";
-
 
         for (int i = 0; i < lecturers.length; i++) {
-
+            
             Lecturer lecturer = lecturers[i];
+            Lecturer lecturerName = this.allLecturers[i];
             boolean signed = lecturer != null;
             String checkbox = signed ? "[x]" : "[ ]";
-            String label = names[i] ;
+            String label = lecturerName.getName();
 
             if (signed) {
                 System.out.println(checkbox + " " + label + " - " + lecturer.getName());
@@ -243,8 +239,6 @@ public class EscapeGame {
         }
     }
     public void exploreCampus() {
-        initializeRooms();
-
         currentRound++;
         System.out.println("You explore the campus. Round " + currentRound + " of 24.");
 
@@ -288,6 +282,8 @@ public class EscapeGame {
         Lecturer l4 = new Lecturer("Frau Safitri");
         Lecturer l5 = new Lecturer("Frau Vaseva");
 
+        this.allLecturers = new Lecturer[] {l1, l2, l3, l4, l5};
+
         rooms[0] = new HTWRoom("A214", "Medienunterrichtsraum", l1);
         rooms[1] = new HTWRoom("A143", "Medienunterrichtsraum", l2);
         rooms[2] = new HTWRoom("A142", "Medienunterrichtsraum", l3);
@@ -310,7 +306,6 @@ public class EscapeGame {
             hero.signExerciseLeader(lecturer);
             lecturer.sign();
             System.out.println(lecturer.getName() + " signs your slip. Well done!");
-            // Kleine Belohnung
             hero.addExperiencePoints(2);
             System.out.println("You gain 2 experience points.");
         } else {
