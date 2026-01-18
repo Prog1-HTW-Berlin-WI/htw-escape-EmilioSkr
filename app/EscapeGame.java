@@ -7,7 +7,8 @@ import model.FriendlyAlien;
 import model.HTWRoom;
 import model.Lecturer;
 
-import java.util.Scanner;
+import java.util.Random;
+import java.io.Serializable;
 
 /**
  * Die Klasse EscapeGame stellt die Spiellogik des Spiels dar.
@@ -34,7 +35,6 @@ public class EscapeGame implements Serializable {
      * Gibt an, ob das Spiel beendet wurde.
      */
     private boolean gameFinished = false;
-
     /**
      * aktuelle Runde im Spielgeschehen.
      */
@@ -109,13 +109,7 @@ public class EscapeGame implements Serializable {
             this.hero = new Hero(heroName.trim());
             System.out.println("Hero " + hero.getName() + " created.\n");
         }
-
-        while (gameRunning && !gameFinished) {
-            printMenu();
-            String choice = readUserInput();
-            handleMenuChoice(choice);
-            System.out.println();
-        }
+        initializeRooms();
     }
 
     /**
@@ -158,10 +152,15 @@ public class EscapeGame implements Serializable {
     }
 
     /**
-     * Platzhalter fuer Erkundung.
+     * Zeigt das Spielmenue an.
      */
-    private void exploreCampus() {
-        System.out.println("You explore the university. (Content to be implemented.)");
+    public void printMenu() {
+        System.out.println("What do you want to do?");
+        System.out.println("(1) Explore the university");
+        System.out.println("(2) Show hero status");
+        System.out.println("(3) Show signed slip");
+        System.out.println("(4) Take a rest");
+        System.out.println("(5) Exit game");
     }
 
     /**
@@ -185,29 +184,20 @@ public class EscapeGame implements Serializable {
             System.out.println("No hero available.");
             return;
         }
-        Lecturer[] lecturers = hero.getSignedExerciseLecturers();
-        
-        String[] names = new String[5];
 
-        names[0] = "Prof1";
-        names[1] = "Prof2";
-        names[2] = "Prof3";
-        names[3] = "Prof4";
-        names[4] = "Prof5";
+        Lecturer[] signedLecturers = hero.getSignedExerciseLecturers();
 
-
-        for (int i = 0; i < lecturers.length; i++) {
-
-            Lecturer lecturer = lecturers[i];
-            boolean signed = lecturer != null;
-            String checkbox = signed ? "[x]" : "[ ]";
-            String label = names[i] ;
-
-            if (signed) {
-                System.out.println(checkbox + " " + label + " - " + lecturer.getName());
-            } else {
-                System.out.println(checkbox + " " + label);
+        for (Lecturer lecturer : allLecturers) {
+            boolean signed = false;
+            for (Lecturer signedLecturer : signedLecturers) {
+                if (signedLecturer != null && signedLecturer.equals(lecturer)) {
+                    signed = true;
+                    break;
+                }
             }
+
+            String checkbox = signed ? "[x]" : "[ ]";
+            System.out.println(checkbox + " " + lecturer.getName());
         }
     }
 
@@ -226,6 +216,102 @@ public class EscapeGame implements Serializable {
             System.out.println("No small rest available anymore.");
         } else {
             System.out.println("You take a rest. Health is now: " + after);
+        }
+    }
+    public void exploreCampus() {
+        currentRound++;
+        System.out.println("You explore the campus. Round " + currentRound + " of 24.");
+
+        if (currentRound > MAXROUNDS) {
+            System.out.println("You couldn't escape within a day. The game is lost.");
+            setGameFinished(true);
+            setGameRunning(false);
+            return;
+        }
+
+        currentRoomIndex = (currentRoomIndex + 1) % rooms.length;
+        HTWRoom current = rooms[currentRoomIndex];
+        System.out.println("You enter room " + current.getIdentifier() + ": " + current.getDescription());
+
+        Random random = new Random();
+        double r = random.nextDouble();
+
+        if (r < 0.20) {
+            System.out.println("Nothing unusual happens. You continue your exploration.");
+            return;
+        } else if (r < 0.72) {
+            handleAlienEncounter();
+            return;
+        } else {
+            handleLecturerEncounter(current);
+            return;
+        }
+    }
+
+    /**
+     * Initialisiert drei Beispielraeume mit Lecturer-Instanzen, falls noch nicht vorhanden.
+     */
+    private void initializeRooms() {
+        if (rooms[0] != null && rooms[0].getIdentifier() != null) {
+            return;
+        }
+
+        Lecturer l1 = new Lecturer("Frau Gärtner");
+        Lecturer l2 = new Lecturer("Herr Gnaoui");
+        Lecturer l3 = new Lecturer("Herr Poeser");
+        Lecturer l4 = new Lecturer("Frau Safitri");
+        Lecturer l5 = new Lecturer("Frau Vaseva");
+
+        this.allLecturers = new Lecturer[] {l1, l2, l3, l4, l5};
+
+        rooms[0] = new HTWRoom("A214", "Medienunterrichtsraum", l1);
+        rooms[1] = new HTWRoom("A143", "Medienunterrichtsraum", l2);
+        rooms[2] = new HTWRoom("A142", "Medienunterrichtsraum", l3);
+        rooms[3] = new HTWRoom("A143", "Medienunterrichtsraum", l4);
+        rooms[4] = new HTWRoom("A236", "Medienunterrichtsraum", l5);
+    }
+
+    /**
+     * Behandelt eine Begegnung mit einem Uebungsgruppenleiter im aktuellen Raum.
+     */
+    private void handleLecturerEncounter(HTWRoom room) {
+        Lecturer lecturer = room.getLecturer();
+        if (lecturer == null) {
+            System.out.println("No one is here to sign your slip.");
+            return;
+        }
+
+        System.out.println("You meet " + lecturer.getName() + ".");
+        if (lecturer.isReadyToSign()) {
+            hero.signExerciseLeader(lecturer);
+            lecturer.sign();
+            System.out.println(lecturer.getName() + " signs your slip. Well done!");
+            hero.addExperiencePoints(2);
+            System.out.println("You gain 2 experience points.");
+        } else {
+            System.out.println(lecturer.getName() + " already signed earlier.");
+        }
+    }
+
+    /**
+     * Behandelt eine Begegnung mit einem Alien.
+     */
+    private void handleAlienEncounter() {
+        Alien alien;
+        Random random = new Random();
+        if (random.nextBoolean()) {
+            alien = new FriendlyAlien();
+        } else {
+            alien = new HostileAlien();
+        }
+        alien.setGreetingText("Hello");
+        System.out.println("You encounter an alien: " + alien.getName() + ". " + alien.greeting(hero.getName()));
+
+        if (alien.isFriendly()) {
+            System.out.println("The alien seems friendly. Nothing hostile happens.");
+            hero.addExperiencePoints(3);
+            System.out.println("You feel inspired and gain 3 experience points.");
+            return;
         }
     }
 }
