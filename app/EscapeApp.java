@@ -22,10 +22,6 @@ public class EscapeApp {
      * Aktuelle Spielinstanz.
      */
     private EscapeGame game;
-    /**
-     * Gibt an, ob das Spiel momentan läuft.
-     */
-    private boolean gameRunning = true;
 
     /**
      * Startet das Spiel und initialisiert die Spielumgebung.
@@ -59,7 +55,7 @@ public class EscapeApp {
         }
 
         // Option 3: Nur anzeigen, wenn ein gespeichertes Spiel vorhanden ist
-        if (hasSavedGame()) {
+        if (hasSavedGame() && !isGameFinished()) {
             System.out.println("(3) Load game");
         }
 
@@ -107,7 +103,7 @@ public class EscapeApp {
                 }
                 break;
             case "3":
-                if (hasSavedGame()) {
+                if (hasSavedGame() && !isGameFinished()) {
                     this.loadGame();
                 } else {
                     System.out.println("Invalid input. Please choose a correct number between 1 and 6");
@@ -143,6 +139,9 @@ public class EscapeApp {
     private void startGame() {
         this.game = new EscapeGame();
         System.out.println("Game started!");
+        System.out.println("Choose a name for your hero:");
+        String heroName = readUserInput();
+        this.game.run(heroName);
         resumeGame();
     }
 
@@ -152,7 +151,12 @@ public class EscapeApp {
     private void resumeGame() {
         if (this.game != null) {
             this.game.setGameRunning(true);
-            this.game.run();
+            while (this.game.isGameRunning()) {
+                this.game.printMenu();
+                String choice = readUserInput();
+                this.game.handleMenuChoice(choice);
+                System.out.println();
+            }
         }
     }
 
@@ -198,7 +202,6 @@ public class EscapeApp {
             System.err.println("Something went wrong while loading the game: " + ex.getMessage());
             return;
         }
-        System.out.println("Game saved!");
     }
 
     /**

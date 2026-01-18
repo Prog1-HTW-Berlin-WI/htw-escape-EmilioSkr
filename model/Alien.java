@@ -30,7 +30,7 @@ public abstract class Alien implements Serializable {
     /**
      * Begruessungstext des Aliens.
      */
-    private final String greetingText;
+    private String greetingText;
 
     /**
      * Erstellt ein neues Alien.
@@ -85,6 +85,9 @@ public abstract class Alien implements Serializable {
             return greetingText;
         }
         return greetingText + " " + playerName + "!";
+    }
+    public void setGreetingText(String greeting) {
+        greetingText = greeting;
     }
 
     /**
