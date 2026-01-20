@@ -52,6 +52,10 @@ public class EscapeGame implements Serializable {
      * alle Übungsleiterinstanzen
      */
     private Lecturer[] allLecturers;
+    /**
+     * Gibt an, ob die kleine Verschnaufpause genutzt wurde: falsch bedeutet nein, wahr bedeutet ja
+     */
+    private int smallRestUsed;
 
     /**
      * Konstruktor der Spielumgebung.
@@ -122,36 +126,6 @@ public class EscapeGame implements Serializable {
     }
 
     /**
-     * Liest eine Nutzereingabe ein.
-     *
-     * @return Eingabezeile
-     */
-    public void handleMenuChoice(String choice) {
-        switch (choice) {
-            case "1":
-                exploreCampus();
-                break;
-            case "2":
-                showHeroStatus();
-                break;
-            case "3":
-                showSignedSlip();
-                break;
-            case "4":
-                takeRest();
-                break;
-            case "5":
-                System.out.println("Exiting game.");
-                // gameFinished = true;
-                gameRunning = false;
-                break;
-            default:
-                System.out.println("Invalid input. Please choose between 1 and 5.");
-                break;
-        }
-    }
-
-    /**
      * Zeigt das Spielmenue an.
      */
     public void printMenu() {
@@ -166,7 +140,7 @@ public class EscapeGame implements Serializable {
     /**
      * Gibt Statuswerte des Helden aus.
      */
-    private void showHeroStatus() {
+    public void showHeroStatus() {
         if (hero == null) {
             System.out.println("No hero available.");
             return;
@@ -179,7 +153,7 @@ public class EscapeGame implements Serializable {
     /**
      * Zeigt den Laufzettel mit unterschriebenen Leitungen.
      */
-    private void showSignedSlip() {
+    public void showSignedSlip() {
         if (hero == null) {
             System.out.println("No hero available.");
             return;
@@ -204,30 +178,46 @@ public class EscapeGame implements Serializable {
     /**
      * Fuehrt eine Verschnaufpause durch.
      */
-    private void takeRest() {
+    public void takeRest(String choice) {
         if (hero == null) {
             System.out.println("No hero available.");
             return;
         }
-        int before = hero.getHealthPoints();
-        hero.regenerate(false);
-        int after = hero.getHealthPoints();
-        if (after == before) {
-            System.out.println("No small rest available anymore.");
-        } else {
-            System.out.println("You take a rest. Health is now: " + after);
+
+        switch (choice) {
+            // Fall: lange Verschnaufpause
+            case "1":
+                hero.regenerate(true);
+                currentRound ++;
+                if (checkIfGameOver()) {
+                    return;
+                }
+                System.out.println("You took a long rest. Health is now: " + hero.getHealthPoints());
+                System.out.println("Current round is now: " + currentRound);
+                break;
+            // Fall: kurze Verschnaufpause
+            case "2":
+                if (smallRestUsed == 1) {
+                    System.out.println("Small rest already used. Choose long rest instead.");
+                    return;
+                }
+                 hero.regenerate(false);
+                 smallRestUsed = 1;
+                 System.out.println("You took a small rest. Health is now: " + hero.getHealthPoints());
+                 break;
+            // Fall: ungültige Eingabe
+            default:
+                System.out.println("Invalid rest choice.");
+                break;
         }
     }
+
+    /**
+     * Erkundet den Campus und behandelt zufaellige Ereignisse (Alien treffen, nichts passiert oder Übungsgruppenleiter treffen).
+     */
     public void exploreCampus() {
         currentRound++;
         System.out.println("You explore the campus. Round " + currentRound + " of 24.");
-
-        if (currentRound > MAXROUNDS) {
-            System.out.println("You couldn't escape within a day. The game is lost.");
-            setGameFinished(true);
-            setGameRunning(false);
-            return;
-        }
 
         currentRoomIndex = (currentRoomIndex + 1) % rooms.length;
         HTWRoom current = rooms[currentRoomIndex];
@@ -313,5 +303,25 @@ public class EscapeGame implements Serializable {
             System.out.println("You feel inspired and gain 3 experience points.");
             return;
         }
+    }
+
+    /**
+     * Prueft, ob das Spiel vorbei ist (Held besiegt oder Rundenlimit erreicht).
+     * @return wahr, wenn das Spiel verloren wurde, sonst falsch
+     */
+    public boolean checkIfGameOver() {
+        if (hero.getHealthPoints() <= 0) {
+            System.out.println("Your hero has been defeated. Game over.");
+            setGameFinished(true);
+            setGameRunning(false);
+            return true;
+        }
+        else if (currentRound >= MAXROUNDS) {
+            System.out.println("You have run out of time. Game over.");
+            setGameFinished(true);
+            setGameRunning(false);
+            return true;
+        }
+        return false;
     }
 }

@@ -134,6 +134,36 @@ public class EscapeApp {
     }
 
     /**
+     * Liest eine Nutzereingabe ein.
+     *
+     * @return Eingabezeile
+     */
+    public void handleMenuChoice(String choice) {
+        switch (choice) {
+            case "1":
+                this.game.exploreCampus();
+                break;
+            case "2":
+                this.game.showHeroStatus();
+                break;
+            case "3":
+                this.game.showSignedSlip();
+                break;
+            case "4":
+                handleRest();
+                break;
+            case "5":
+                System.out.println("Exiting game.");
+                // gameFinished = true;
+                this.game.setGameRunning(false);
+                break;
+            default:
+                System.out.println("Invalid input. Please choose between 1 and 5.");
+                break;
+        }
+    }
+
+    /**
      * Initialisiert die Spielumgebung.
      */
     private void startGame() {
@@ -152,9 +182,10 @@ public class EscapeApp {
         if (this.game != null) {
             this.game.setGameRunning(true);
             while (this.game.isGameRunning()) {
+                this.game.checkIfGameOver();
                 this.game.printMenu();
                 String choice = readUserInput();
-                this.game.handleMenuChoice(choice);
+                this.handleMenuChoice(choice);
                 System.out.println();
             }
         }
@@ -202,6 +233,18 @@ public class EscapeApp {
             System.err.println("Something went wrong while loading the game: " + ex.getMessage());
             return;
         }
+    }
+
+    /**
+     * Behandelt die Eingabe der Verschnaufpause. (1 bedeutet lange Verschnaufpause, 2 bedeutet kurze Verschnaufpause).
+     */
+    private void handleRest() {
+        System.out.println("Choose rest type:");
+        System.out.println("(1) Long rest");
+        System.out.println("(2) Short rest");
+        System.out.println();
+        String restChoice = readUserInput();
+        this.game.takeRest(restChoice);
     }
 
     /**
