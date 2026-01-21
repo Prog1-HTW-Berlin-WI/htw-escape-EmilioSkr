@@ -8,10 +8,14 @@ import java.io.ObjectOutputStream;
 import java.util.Scanner;
 
 /**
- * Die Klasse EscapeApp dient zur Anzeige der Spiellogik und regelt die Interaktion zwischen Konsole und Spieler.
+ * Start und UI-Klasse der Anwendung.
  * 
- * @author anas
- * @author emilio
+ * Verantwortlich für die Anzeige der Menüs, das Einlesen der Nutzereingaben
+ * und die Delegation an die Spiel-Logik in {@link EscapeGame} (Starten,
+ * Fortsetzen, Speichern, Laden und Löschen von Spielständen).
+ * 
+ * @author Anas
+ * @author Emilio
  */
 public class EscapeApp {
     /**
@@ -24,7 +28,10 @@ public class EscapeApp {
     private EscapeGame game;
 
     /**
-     * Startet das Spiel und initialisiert die Spielumgebung.
+     * Einstiegspunkt der Anwendung. Zeigt das Hauptmenü in einer Schleife an und
+     * verarbeitet Nutzereingaben.
+     * 
+     * @param args nicht verwendet
      */
     public static void main(String[] args) {
         System.out.println("Welcome to the HTW escape");
@@ -41,8 +48,8 @@ public class EscapeApp {
     }
 
     /**
-     * Darstellung des Hauptmenues mit Auswahlmöglichkeiten.
-     * Zeigt nur die verfügbaren Optionen basierend auf dem Spielzustand an.
+     * Darstellung des Hauptmenüs mit Auswahlmöglichkeiten.
+     * Zeigt nur die verfügbaren Optionen basierend auf dem aktuellen Spielzustand an.
      */
     private void showMainMenu() {
         System.out.println("You're in the main menu");
@@ -75,7 +82,7 @@ public class EscapeApp {
     }
 
     /**
-     * Liest die Eingabe und gibt sie wieder aus.
+     * Liest eine komplette Zeile von der Standard-Eingabe.
      * 
      * @return Eingabe, das der Nutzer in die Konsole eingetippt hat
      */
@@ -86,9 +93,12 @@ public class EscapeApp {
     }
 
     /**
-     * Behandelt die Eingabe.
+     * Verarbeitet die Eingabe aus dem Hauptmenü und führt die entsprechende Aktion aus.
      * 
-     * @param input Eingabe, das der Nutzer in die Konsole eingetippt hat
+     * Gültige Optionen hängen vom aktuellen Spielzustand ab (z. B. nur speichern,
+     * wenn bereits ein Spiel läuft).
+     * 
+     * @param input die ausgewählte Menüoption ("1" bis "6")
      */
     private void handleUserInput(String input) {
         switch (input) {
@@ -134,9 +144,9 @@ public class EscapeApp {
     }
 
     /**
-     * Liest eine Nutzereingabe ein.
-     *
-     * @return Eingabezeile
+     * Verarbeitet eine Auswahl innerhalb des Spielmenüs (während ein Spiel läuft).
+     * 
+     * @param choice die ausgewählte Option ("1" bis "5")
      */
     public void handleMenuChoice(String choice) {
         switch (choice) {
@@ -164,7 +174,8 @@ public class EscapeApp {
     }
 
     /**
-     * Initialisiert die Spielumgebung.
+     * Startet ein neues Spiel: erstellt die Spielinstanz, fragt den Heldennamen ab
+     * und übergibt diesen an die Spiel-Logik.
      */
     private void startGame() {
         this.game = new EscapeGame();
@@ -176,7 +187,8 @@ public class EscapeApp {
     }
 
     /**
-     * Setzt das Spiel fort.
+     * Setzt das Spiel fort, zeigt wiederholt das Spielmenü an und verarbeitet die
+     * Spielauswahl, solange das Spiel läuft.
      */
     private void resumeGame() {
         if (this.game != null) {
@@ -192,7 +204,8 @@ public class EscapeApp {
     }
 
     /**
-     * Loescht den Speicherstand.
+     * Löscht den vorhandenen Speicherstand ({@link #SAVE_FILE_NAME}).
+     * Gibt das Ergebnis der Operation auf der Konsole aus.
      */
     private void deleteGame() {
         if (new File(SAVE_FILE_NAME).delete()) {
@@ -203,7 +216,8 @@ public class EscapeApp {
     }
 
     /**
-     * Speichert den aktuellen Stand des Spiels in einer Datei.
+     * Speichert den aktuellen Stand des Spiels in eine Datei ({@link #SAVE_FILE_NAME})
+     * mittels Java-Serialisierung.
      */
     private void saveGame() {
         if (this.game == null) {
@@ -222,7 +236,8 @@ public class EscapeApp {
     }
 
     /**
-     * Laedt das Spiel mithilfe des Speicherstands.
+     * Lädt den Spielstand aus der Datei ({@link #SAVE_FILE_NAME}) mittels
+     * Java-Deserialisierung und stellt die Spielinstanz wieder her.
      */
     private void loadGame() {
         try (FileInputStream fis = new FileInputStream(SAVE_FILE_NAME);
@@ -236,7 +251,8 @@ public class EscapeApp {
     }
 
     /**
-     * Behandelt die Eingabe der Verschnaufpause. (1 bedeutet lange Verschnaufpause, 2 bedeutet kurze Verschnaufpause).
+     * Behandelt die Eingabe zur Verschnaufpause im laufenden Spiel.
+     * ("1" bedeutet lange Verschnaufpause, "2" bedeutet kurze Verschnaufpause).
      */
     private void handleRest() {
         System.out.println("Choose rest type:");
@@ -248,16 +264,16 @@ public class EscapeApp {
     }
 
     /**
-     * Prueft, ob das Spiel momentan laeuft.
+     * Prüft, ob es eine aktive Spielinstanz gibt.
      * 
-     * @return wahr, wenn eine Spielinstanz exisitert, sonst falsch
+     * @return wahr, wenn eine Spielinstanz existiert, sonst falsch
      */
     private boolean isGameRunning() {
         return game != null;
     }
 
     /**
-     * Ausgabe, ob das Spiel beendet wurde.
+     * Prüft, ob das aktuelle Spiel bereits beendet wurde.
      * 
      * @return wahr, wenn Spielinstanz existiert und Spiel beendet wurde
      */
@@ -267,7 +283,7 @@ public class EscapeApp {
 
 
     /**
-     * Prueft, ob ein Speicherstand vorhanden ist.
+     * Prüft, ob ein Speicherstand vorhanden ist.
      * 
      * @return wahr, wenn ein Speicherstand vorhanden ist, sonst falsch
      */

@@ -86,6 +86,12 @@ public abstract class Alien implements Serializable {
         }
         return greetingText + " " + playerName + "!";
     }
+    
+    /**
+     * Setzt den Begrüßungstext des Aliens.
+     * 
+     * @param greeting neuer Begrüßungstext
+     */
     public void setGreetingText(String greeting) {
         greetingText = greeting;
     }

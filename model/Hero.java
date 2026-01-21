@@ -3,6 +3,14 @@ package model;
 import java.io.Serializable;
 import java.util.Random;
 
+/**
+ * Spielcharakter (Held) des Spiels.
+ * 
+ * Verwaltet Lebenspunkte, Erfahrungspunkte, Namen, sowie den Laufzettel mit
+ * unterschreibenden Übungsleitungen. Bietet Aktionen wie Regeneration,
+ * Angriff, Fluchtversuch und das Eintragen von Unterschriften.
+ * 
+ */
 public class Hero implements Serializable {
 
     // Bitte serialVersionUID beibehalten, damit die Klasse bei der
@@ -64,11 +72,11 @@ public class Hero implements Serializable {
         }
     }
     /**
-     * Ermoeglicht dem Helden eine Verschnaufpause.
-     * Falls longRest wahr ist, dann hat der Held eine große Verschnaufpause und regeneriert 10 Lebenspunkte.
-     * Falls longRest falsch ist, dann hat der Held eine kleine Verschnaufpause und regeneriert 3 Lebenspunkte.
+     * Ermöglicht dem Helden eine Verschnaufpause.
+     * Wenn {@code longRest} wahr ist, regeneriert der Held 10 Lebenspunkte (große Pause),
+     * andernfalls 3 Lebenspunkte (kleine Pause, nur einmal möglich).
      * 
-     * @param longRest
+     * @param longRest {@code true} für lange Pause, sonst kurze Pause
      */
     public void regenerate(boolean longRest) {
         if (longRest) {
@@ -87,10 +95,9 @@ public class Hero implements Serializable {
     }
 
     /**
-     * Versucht aus einer Begegnung mit dem Gegner zu fliehen.
-     * Falls es einen Erfolg gibt, dann wird wahr ausgegeben, sonst falsch.
+     * Versucht aus einer Begegnung mit einem Gegner zu fliehen.
      * 
-     * @return boolean, ob der Fluchtversuch erfolgreich war, wahr bedeutet ja, falsch bedeutet nein
+     * @return {@code true}, wenn die Flucht gelingt; sonst {@code false}
      */
     public boolean flee() {
         Random random = new Random();
@@ -102,11 +109,10 @@ public class Hero implements Serializable {
     }
 
     /**
-     * Fuehrt einen Angriff auf ein feindliches Wesen aus.
-     * 13% Fehlschlag: Schaden 0.
-     * 12% kritischer Treffer: Doppelter Schaden
+     * Führt einen Angriff aus und berechnet den Schaden.
+     * 13% Fehlschlag (0 Schaden), weitere 12% kritischer Treffer (doppelter Schaden).
      * 
-     * @return Ganzzahliger berechneter Schaden
+     * @return ganzzahliger berechneter Schaden
      */
      public int attack() {
         double baseDamage = experiencePoints * 2.3 + 1;
@@ -122,10 +128,10 @@ public class Hero implements Serializable {
         return (int) baseDamage;
     }
     /**
-     * Traegt den angegebenen Übungsgruppenleiter in den naechsten freien
-     * Platz des Laufzettels ein. Jeder Leiter darf nur einmal unterschreiben.
+     * Trägt die angegebene Übungsleitung in den nächsten freien Platz des Laufzettels ein.
+     * Jede Person darf nur einmal unterschreiben.
      *
-    * @param lecturer Übungsgruppenleiter
+     * @param lecturer Übungsgruppenleitung
      */
     public void signExerciseLeader(Lecturer lecturer) {
         if (lecturer == null) {
@@ -156,9 +162,9 @@ public class Hero implements Serializable {
     }
 
     /**
-     * Erhoeht die Erfahrungspunkte des Helden um den angegebenen Wert.
+     * Erhöht die Erfahrungspunkte des Helden um den angegebenen Wert.
      *
-     * @param experiencePoints Anzahl der hinzuzufuegenden Erfahrungspunkte
+     * @param experiencePoints Anzahl der hinzuzufügenden Erfahrungspunkte (positiv)
      */
     public void addExperiencePoints(int experiencePoints) {
         if (experiencePoints > 0) {
@@ -166,9 +172,9 @@ public class Hero implements Serializable {
         }
     }
     /**
-     * Gibt an, ob der Held noch handlungsfaehig ist.
+     * Gibt an, ob der Held noch handlungsfähig ist.
      *
-     * @return wahr, wenn die Lebenspunkte groeßer als 0 sind
+     * @return wahr, wenn die Lebenspunkte größer als 0 sind
      */
     public boolean isOperational() {
         return healthPoints > 0;
@@ -193,9 +199,9 @@ public class Hero implements Serializable {
     }
 
     /**
-     * Gibt eine Kopie der unterschriebenen Übungsgruppenleiter*innen zurueck.
+     * Gibt eine Kopie der unterschriebenen Übungsleitungen zurück.
      *
-     * @return Array-Kopie der unterschreibenden Leiter
+     * @return Array-Kopie der unterschreibenden Leitungen
      */
     public Lecturer[] getSignedExerciseLecturers() {
         return signedExerciseLecturers.clone();
