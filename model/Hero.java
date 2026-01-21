@@ -100,7 +100,9 @@ public class Hero implements Serializable {
      * @return {@code true}, wenn die Flucht gelingt; sonst {@code false}
      */
     public boolean flee() {
+        // zufallzahl zwischen 0.0 und 1.0
         Random random = new Random();
+        // wenn zahl kleiner als 0.42 ist, flucht erfolgreich, sonst nicht
         if (random.nextDouble() < 0.42) {
             return true;
         } else {

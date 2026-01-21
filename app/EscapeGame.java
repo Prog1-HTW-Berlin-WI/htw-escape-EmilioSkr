@@ -8,6 +8,7 @@ import model.HTWRoom;
 import model.Lecturer;
 
 import java.util.Random;
+import java.util.Scanner;
 import java.io.Serializable;
 
 /**
@@ -342,6 +343,106 @@ public class EscapeGame implements Serializable {
             hero.addExperiencePoints(3);
             System.out.println("You feel inspired and gain 3 experience points.");
             return;
+        }
+
+        /**
+         * Begegnung mit feindlichem Alien
+         * HostileAlien casten: Das Alien-Objekt in
+         * eine HostileAlien-Instanz umwandeln, um auf spezifische Methoden zugreifen zu können.
+         */
+        HostileAlien hostile = (HostileAlien) alien;
+        Scanner scanner = new Scanner(System.in);
+
+        /**
+         * Kampf- und Fluchtlogik:
+         * Der Spieler kann wählen zu kämpfen oder zu fliehen.
+         */
+        while (true) {
+            System.out.println("A hostile alien approaches! What do you do?");
+            System.out.println("(1) Fight");
+            System.out.println("(2) Flee");
+            String choice = scanner.nextLine();
+
+            // Spieler wählt zu kämpfen oder zu fliehen
+            if ("1".equals(choice)) {
+                // solange kämpfen, bis einer besiegt ist
+                while (!hostile.isDefeated() && hero.isOperational()) {
+                    // Held greift an
+                    int damage = hero.attack();
+                    System.out.println("You attack and deal " + damage + " damage.");
+                    // Alien nimmt Schaden
+                    hostile.takeDamage(damage);
+                    // wenn Alien besiegt ist, Erfahrungspunkte vergeben
+                    if (hostile.isDefeated()) {
+                        System.out.println("You defeated the hostile alien!");
+                        hero.addExperiencePoints(5);
+                        System.out.println("You gain 5 experience points.");
+                        return;
+                    }
+
+                    // in dieser variable wird der schaden des aliens gespeichert
+                    // und zufällig zwischen 5 und 10 bestimmt
+                    int alienDamage = 5 + new Random().nextInt(6); // 5..10 Schaden
+                    System.out.println("The alien strikes back and hits you for " + alienDamage + ".");
+                    // Held nimmt Schaden
+                    hero.takeDamage(alienDamage);
+                    System.out.println("Your health is now: " + hero.getHealthPoints());
+                    // wenn Held besiegt ist, Erfahrungspunkte vergeben
+                    if (!hero.isOperational()) {
+                        System.out.println("You have been defeated by the hostile alien.");
+                        hero.addExperiencePoints(1);
+                        System.out.println("You gain 1 experience point for the encounter.");
+                        return;
+                    }
+                }
+                return;
+
+                // weenn der Spieler fliehen möchte
+            } else if ("2".equals(choice)) {
+                // Versuch zu fliehen.
+                boolean escaped = hero.flee();
+                if (escaped) {
+                    System.out.println("You successfully fled from the hostile alien.");
+                    return; // Flucht erfolgreich, Begegnung beendet
+                } else {
+                    System.out.println("Your escape failed! The alien forces you to fight.");
+                    // solange kämpfen, bis einer besiegt ist
+                    while (!hostile.isDefeated() && hero.isOperational()) {
+                        int damage = hero.attack();
+                        System.out.println("You attack and deal " + damage + " damage.");
+                        // Alien nimmt Schaden
+                        hostile.takeDamage(damage);
+                        // wenn Alien besiegt ist, Erfahrungspunkte vergeben
+                        if (hostile.isDefeated()) {
+                            System.out.println("You defeated the hostile alien!");
+                            hero.addExperiencePoints(5);
+                            System.out.println("You gain 5 experience points.");
+                            return;
+                        }
+
+                        // in dieser variable wird der schaden des aliens gespeichert
+                        // und zufällig zwischen 5 und 10 bestimmt
+                        int alienDamage = 5 + new Random().nextInt(6); // 5..10 Schaden
+                        System.out.println("The alien strikes back and hits you for " + alienDamage + ".");
+                        
+                        // Held nimmt Schaden
+                        hero.takeDamage(alienDamage);
+                        System.out.println("Your health is now: " + hero.getHealthPoints());
+                        
+                        // wenn Held besiegt ist, Erfahrungspunkte vergeben
+                        if (!hero.isOperational()) {
+                            System.out.println("You have been defeated by the hostile alien.");
+                            hero.addExperiencePoints(1);
+                            System.out.println("You gain 1 experience point for the encounter.");
+                            return;
+                        }
+                    }
+                    return;
+                }
+            } else {
+                // ungültige Eingabe
+                System.out.println("Invalid choice. Please select 1 or 2.");
+            }
         }
     }
 
