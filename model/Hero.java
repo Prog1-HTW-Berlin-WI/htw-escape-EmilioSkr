@@ -10,6 +10,8 @@ import java.util.Random;
  * unterschreibenden Übungsleitungen. Bietet Aktionen wie Regeneration,
  * Angriff, Fluchtversuch und das Eintragen von Unterschriften.
  * 
+ * @author Anas
+ * @author Emilio
  */
 public class Hero implements Serializable {
 

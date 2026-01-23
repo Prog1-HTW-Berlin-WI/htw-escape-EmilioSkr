@@ -2,6 +2,9 @@ package model;
 
 /**
  * Freundliches Alien mit moderaten Lebenspunkten.
+ * 
+ * @author Anas
+ * @author Emilio
  */
 public class FriendlyAlien extends Alien {
 

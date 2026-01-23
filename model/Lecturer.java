@@ -5,6 +5,9 @@ import java.io.Serializable;
 /**
  * Repraesentiert eine Übungsgruppenleiterin bzw. einen Übungsgruppenleiter,
  * die bzw. der den Laufzettel unterschreiben kann.
+ * 
+ * @author Anas
+ * @author Emilio
  */
 public class Lecturer implements Serializable {
 

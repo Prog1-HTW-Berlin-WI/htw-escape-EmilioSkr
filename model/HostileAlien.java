@@ -2,6 +2,9 @@ package model;
 
 /**
  * Feindliches Alien mit hoeheren Lebenspunkten.
+ * 
+ * @author Anas
+ * @author Emilio
  */
 public class HostileAlien extends Alien {
 

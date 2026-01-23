@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 /**
  * Abstrakte Basisklasse fuer alle Alien-Typen.
+ * 
+ * @author Anas
+ * @author Emilio
  */
 public abstract class Alien implements Serializable {
 

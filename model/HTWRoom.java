@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 /**
  * Repraesentiert einen Raum innerhalb der HTW.
+ * 
+ * @author Anas
+ * @author Emilio
  */
 public class HTWRoom implements Serializable {
 
