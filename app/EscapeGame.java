@@ -6,6 +6,7 @@ import model.Alien;
 import model.FriendlyAlien;
 import model.HTWRoom;
 import model.Lecturer;
+import model.Question;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -58,6 +59,14 @@ public class EscapeGame implements Serializable {
         * 0 bedeutet nein, 1 bedeutet ja.
      */
     private int smallRestUsed;
+    /**
+     * Array mit den Fragen von Professorin Majuntke
+     */
+    private Question[] professorQuestions;
+    /**
+     * Markiert, ob Professorin Majuntke bereits getroffen wurde (Quiz abgeschlossen)
+     */
+    private boolean professorAlreadyMet = false;
 
     /**
      * Konstruktor der Spielumgebung.
@@ -134,7 +143,7 @@ public class EscapeGame implements Serializable {
      * Zeigt das Spielmenue an.
      */
     public void printMenu() {
-        System.out.println("What do you want to do?");
+        System.out.println("=== Gamemenu (Round " + currentRound + " / " + MAXROUNDS + ") ===");
         System.out.println("(1) Explore the university");
         System.out.println("(2) Show hero status");
         System.out.println("(3) Show signed slip");
@@ -232,10 +241,19 @@ public class EscapeGame implements Serializable {
     /**
      * Erkundet den Campus und behandelt zufällige Ereignisse:
      * nichts, Begegnung mit Alien oder Treffen einer Übungsleitung.
+     * Nach 5 Unterschriften kann Professorin Majuntke getroffen werden.
      */
     public void exploreCampus() {
+        // Prüfe, ob der Spieler alle 5 Unterschriften hat
+        if (countSignatures() >= 5 && !professorAlreadyMet) {
+            handleProfessorMajuntkeEncounter();
+            professorAlreadyMet = true;
+            return;
+        }
+        
         currentRound++;
-        System.out.println("You explore the campus. Round " + currentRound + " of 24.");
+        System.out.println("----------------------------------");
+        System.out.println("You explore the campus.");
 
         /**
          * Wechselt zum nächsten Raum im Kreis und
@@ -291,6 +309,46 @@ public class EscapeGame implements Serializable {
         rooms[2] = new HTWRoom("A142", "Medienunterrichtsraum", l3);
         rooms[3] = new HTWRoom("A143", "Medienunterrichtsraum", l4);
         rooms[4] = new HTWRoom("A236", "Medienunterrichtsraum", l5);
+        
+        // Initialisierung der Fragen für Professorin Majuntke
+        initializeQuestions();
+    }
+    
+    /**
+     * Initialisiert die drei Fragen für Professorin Majuntke.
+     */
+    private void initializeQuestions() {
+        professorQuestions = new Question[3];
+        
+        // Frage 1
+        professorQuestions[0] = new Question(
+            "Which data type would you use to store a phone number (+49 ...)?",
+            "(A) int",
+            "(B) String",
+            "(C) char",
+            "(D) float",
+            2  // Index 2 ist korrekt (dritte Antwort)
+        );
+        
+        // Frage 2
+        professorQuestions[1] = new Question(
+            "Which statement about one-dimenstional arrays is correct?",
+            "(A) An array can only contain elements from the same data type",
+            "(B) The size of an array can be changed all the time",
+            "(C) Arrays can only save integers",
+            "(D) An Array gets initialized with random values",
+            2  // Index 2 ist korrekt (dritte Antwort)
+        );
+        
+        // Frage 3
+        professorQuestions[2] = new Question(
+            "What is recursion in programming?",
+            "(A) A function that calls itself",
+            "(B) A loop that runs backwards",
+            "(C) A variable declared multiple times",
+            "(D) A method that can only be called once",
+            0  // Index 0 ist korrekt (erste Antwort)
+        );
     }
 
     /**
@@ -359,7 +417,7 @@ public class EscapeGame implements Serializable {
          */
         while (true) {
             System.out.println("A hostile alien approaches! What do you do?");
-            System.out.println("(1) Fight");
+            System.out.println("(1) Attack");
             System.out.println("(2) Flee");
             String choice = scanner.nextLine();
 
@@ -453,17 +511,149 @@ public class EscapeGame implements Serializable {
      */
     public boolean checkIfGameOver() {
         if (hero.getHealthPoints() <= 0) {
+            System.out.println("--------------------------------------------------");
             System.out.println("Your hero has been defeated. Game over.");
             setGameFinished(true);
             setGameRunning(false);
             return true;
         }
         else if (currentRound >= MAXROUNDS) {
-            System.out.println("You have run out of time. Game over.");
+            System.out.println("--------------------------------------------------");
+            System.out.println("\nYou've exceeded the number of rounds (maximum 24)! Game over.");
+            System.out.println("Professor Majuntke goes in her spaceship...");
+            System.out.println("Have fun with programming - or maybe not...\n");
+            System.out.println("'The spaceship flies away ...'\n");
             setGameFinished(true);
             setGameRunning(false);
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Handhabt das Treffen mit Professorin Majuntke nach 5 Unterschriften.
+     * Der Spieler muss ein Quiz mit zwei Chancen bestehen.
+     */
+    public void handleProfessorMajuntkeEncounter() {
+        if (professorAlreadyMet) {
+            System.out.println("Professor Majuntke is already gone.");
+            return;
+        }
+
+        System.out.println("=== Professor Majuntke ===");
+        System.out.println("\nSuddenly, Professor Majuntke appears!");
+        System.out.println("Congratulations! You have collected all the signatures.");
+        System.out.println("Now you must answer a question about \"Fundamentals of Programming\".");
+        System.out.println("If you answer correctly, you will receive a certificate and can leave the HTW.");
+        
+        // Erste Chance
+        boolean firstAttemptCorrect = askQuestion();
+        
+        if (firstAttemptCorrect) {
+            System.out.println("That's correct! Here is your certificate!");
+            System.out.println("___________________________\n" + //
+                                "| ===== CERTIFICATE ===== |\n" + //
+                                "| Congratulations!        |\n" + //
+                                "| You finished the quiz!  |\n" + //
+                                "|_________________________|\n" + //
+                                "I need to go now! Have a great time!");
+            System.out.println("The doors of the HTW open ...");
+            System.out.println("\nCONGRATULATIONS! You have won the game!\n");
+            hero.addExperiencePoints(10);
+            setGameFinished(true);
+            setGameRunning(false);
+            return;
+        }
+        
+        // Zweite Chance
+        System.out.println("=== Professor Majuntke ===");
+        System.out.println("\nUnforunately, the answer was not correct.");
+        System.out.println("You have a second chance!\n");
+        
+        boolean secondAttemptCorrect = askQuestion();
+        
+        if (secondAttemptCorrect) {
+            System.out.println("That's correct! Here is your certificate!");
+            System.out.println("___________________________\n" + //
+                                "| ===== CERTIFICATE ===== |\n" + //
+                                "| Congratulations!        |\n" + //
+                                "| You finished the quiz!  |\n" + //
+                                "|_________________________|\n" + //
+                                "I need to go now! Have a great time!");
+            System.out.println("The doors of the HTW open ...");
+            System.out.println("\nCONGRATULATIONS! You have won the game!\n");
+            hero.addExperiencePoints(10);
+            setGameFinished(true);
+            setGameRunning(false);
+            return;
+        }
+        
+        // Beide Chancen vorbei
+        System.out.println("\nProfessor Majuntke looks sadly at you.");
+        System.out.println("That was your last chance.");
+        System.out.println("She gets into her spaceship and flies away...");
+        System.out.println("'Programming is not for everyone. See you later!'");
+        System.out.println("\nGAME OVER - You failed the quiz.\n");
+        setGameFinished(true);
+        setGameRunning(false);
+    }
+    
+    /**
+     * Stellt eine zufällig ausgewählte Frage und verarbeitet die Antwort.
+     * 
+     * @return true, wenn die Antwort korrekt ist, sonst false
+     */
+    private boolean askQuestion() {
+        Random random = new Random();
+        Question question = professorQuestions[random.nextInt(professorQuestions.length)];
+        
+        System.out.println("Question: " + question.getQuestion());
+        String[] answers = question.getAnswers();
+        for (int i = 0; i < answers.length; i++) {
+            System.out.println(answers[i]);
+        }
+        
+        System.out.print("Your answer (1-4): ");
+        Scanner scanner = new Scanner(System.in);
+        String userInput = scanner.nextLine();
+        
+        try {
+            int answerIndex = Integer.parseInt(userInput) - 1;
+            
+            if (answerIndex < 0 || answerIndex > 3) {
+                System.out.println("Invalid input! Please choose 1-4.");
+                return askQuestion();
+            }
+            
+            if (question.isCorrect(answerIndex)) {
+                System.out.println("Correct! The correct answer is: " + question.getCorrectAnswer());
+                return true;
+            } else {
+                System.out.println("Incorrect! The correct answer would be: " + question.getCorrectAnswer());
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input! Please choose a number between 1 and 4.");
+            return askQuestion();
+        }
+    }
+    
+    /**
+     * Zählt die Anzahl der unterschriebenen Unterschriften.
+     * 
+     * @return Anzahl der unterschriebenen Übungsleitungen
+     */
+    private int countSignatures() { 
+        if (hero == null) {
+            return 0;
+        }
+        Lecturer[] signedLecturers = hero.getSignedExerciseLecturers();
+        int count = 0;
+        for (Lecturer lecturer : signedLecturers) {
+            if (lecturer != null) {
+                count++;
+            }
+        }
+        return count;
     }
 }
